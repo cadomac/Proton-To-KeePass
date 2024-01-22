@@ -1,0 +1,1 @@
+from proton_to_keepass.version import __version__
