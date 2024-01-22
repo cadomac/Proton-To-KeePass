@@ -38,29 +38,29 @@ class Config():
       exit()
 
     if "--path" in self._args or "-p" in self._args:
-      if "--path" in self._args:
-        path_arg_idx = self._args.index("--path")
-      else:
-        path_arg_idx = self._args.index("-p")
-      if arg_len > path_arg_idx + 1:
-        self._encrypted_file_path = os.path.abspath(self._args[path_arg_idx + 1].strip())
-        
-        if self._encrypted_file_path[-4:] != ".gpg" and self._encrypted_file_path[-4:] != ".pgp":
-          print("   Error: File must be encrypted with GnuPG/PGP.")
-          exit()
-      else:
-        print("   Error: --path,-p flag requires a path argument.")
-        exit()
+      self.parse_path("--path" if "--path" in self._args else "-p", arg_len)
 
     if "--verbose" in self._args or "-v" in self._args:
       self._verbose = True
-      return
+
+  def parse_path(self, path_arg, arg_len):
+    path_arg_idx = self._args.index(path_arg)
+
+    if arg_len > path_arg_idx + 1:
+      self._encrypted_file_path = os.path.abspath(self._args[path_arg_idx + 1].strip())
+      
+      if not self._encrypted_file_path[-4:].endswith(".gpg") and not self._encrypted_file_path.endswith(".pgp"):
+        print("   Error: File must be encrypted with GnuPG/PGP.")
+        exit()
+    else:
+      print("   Error: --path,-p flag requires a path argument.")
+      exit()
   
   def empty_input_handler(self, message, err_msg, allow_ignore=False):
     curr_input = ""
     while curr_input == "":
       if allow_ignore:
-        ignore = input(f"   WARNING: You have entered an empty value! This is not recommended for security reasons. Ignore and continue? (y/n): ")
+        ignore = input("   WARNING: You have entered an empty value! This is not recommended for security reasons. Ignore and continue? (y/n): ")
         if ignore == "y":
           break
       else:
@@ -74,6 +74,17 @@ class Config():
   def gather_input(self):
     self._gnupath = input("Enter path to GnuPG/PGP binary (/usr/bin/gpg): ") or self._gnupath
 
+    self.gather_input_info()
+    self.gather_output_info()
+
+    self._merge_vaults = input("Merge vaults into root folder? (default: n) (y/n): ")
+    self._separate_totp = input("Separate your TOTP/2FA into their own file? (default: n) (y/n): ") or False
+
+    if self._separate_totp == "y":
+      self.separate_totp = True
+      self.initialize_totp_db()
+
+  def gather_input_info(self):
     if self._encrypted_file_path != "":
       print(f"   Using file path from --path flag: {self._encrypted_file_path}")
     else:
@@ -84,6 +95,7 @@ class Config():
 
     self._encrypted_file_passkey = getpass("Enter passphrase for encrypted file: ")
 
+  def gather_output_info(self):
     self._output_file_name = input(f"Desired filename for output KDBX file ({self._default_output_file_name}): ") or self._default_output_file_name
     self._output_file_path = input(f"Desired path for output KDBX file ({self._cwd}): ") or self._cwd
     self._output_file_passkey = getpass("Password for new KDBX: ") or ""
@@ -96,14 +108,6 @@ class Config():
 
     if self._output_file_passkey == "":
       self._output_file_passkey = self.empty_input_handler("Password for new KDBX", "Error: No password provided.", allow_ignore=True)
-
-
-    self._merge_vaults = input("Merge vaults into root folder? (default: n) (y/n): ")
-    self._separate_totp = input("Separate your TOTP/2FA into their own file? (default: n) (y/n): ") or False
-
-    if self._separate_totp == "y":
-      self.separate_totp = True
-      self.initialize_totp_db()
 
   def initialize_totp_db(self):
     default_totp_filename = f"./pp_convert_totp_{self._timestamp}.kdbx"
