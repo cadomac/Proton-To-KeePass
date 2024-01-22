@@ -1,0 +1,19 @@
+[project]
+name = "proton_to_keepass"
+version = "0.0.1"
+authors = [
+  { name="Cameron MacDonald", email="pypi.ember745@passmail.net" },
+]
+description = "Convert Proton Pass exports to KeePass databases securely for encrypted local backup."
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
+    "Operating System :: OS Independent",
+]
+
+[project.urls]
+Homepage = "https://github.com/cadomac/Proton-To-KeePass"
+Issues = "https://github.com/cadomac/Proton-To-KeePass/issues"
