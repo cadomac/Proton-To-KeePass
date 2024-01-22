@@ -1,41 +1,42 @@
 from proton_to_keepass.converter import Converter
 from proton_to_keepass.kp_manager import KeePassManager
-from getpass import getpass
+from proton_to_keepass.config import Config
 import os
+import sys
 
-gnupath = input("Enter path to GnuPG/PGP binary (default: /usr/bin/gpg): ") or "/usr/bin/gpg"
-filepath = input("Enter path to encrypted file: ")
-passphrase = getpass("Enter passphrase for encrypted file: ")
-outputPath = input("Desired path & filename for output KDBX file (default: ./proton-conversion.kdbx): ") or "./proton-conversion.kdbx"
-kdbxPass = getpass("Password for new KDBX: ") or ""
-mergeVaults = input("Merge vaults into root folder? (default: n) (y/n): ")
-separateTOTP = input("Separate your TOTP/2FA into their own file? (default: n) (y/n): ") or False
+config = Config(sys.argv)
 
-keepManager = KeePassManager(outputPath, kdbxPass)
-if separateTOTP == "y":
-  separateTOTP = True
-  totpOutputPath = input("Desired path for output TOTP KDBX file (default: ./proton-conversion-totp.kdbx): ") or "./proton-conversion-totp.kdbx"
-  kdbxTotpPass = getpass("Password for TOTP KDBX (default: same as main file): ") or kdbxPass
-  keepManagerTotp = KeePassManager(totpOutputPath, kdbxTotpPass)
-converter = Converter(filepath, passphrase, gnupath)
+converter = Converter(config)
+converter.decrypt_file_to_json()
 
-converter.decrypt_convert_file()
+keepManager = KeePassManager(config)
 
+if config.separate_totp:
+  keepManagerTotp = KeePassManager(config)
+
+group = keepManager.root
 for (_, vault) in converter.vaults:
-  if mergeVaults != "y":
+  if config.verbose:
+    print(f"   Opening {vault['name']}...")
+  if config.merge_vaults != "y":
     group = keepManager.create_group(vault["name"])
   for item in vault["items"]:
     entry = converter.create_entry(item)
     keepManager.add_entry(group, entry)
-    print(f"   Converted {entry.name}!")
+    if config.verbose:
+      print(f"   Converted {entry.name}!")
 
-    if separateTOTP and entry.totp:
+    if config.separate_totp and entry.totp:
       keepManagerTotp.add_entry(entry)
-      print(f"   Separated {entry.name} TOTP!")
+      if config.verbose:
+        print(f"   Separated {entry.name} TOTP!")
 
 keepManager.save()
-if separateTOTP:
+if config.separate_totp:
   keepManagerTotp.save()
 
 print(f"   Successfully converted {len(converter.vaults)} vaults!")
-print(f"   Saved to {os.path.abspath(outputPath)}!")
+print(f"   Saved to {os.path.abspath(f'{config.output_file_path}/{config.output_file_name}')}!")
+
+if config.separate_totp:
+  print(f"   Saved TOTP to {os.path.abspath(f'{config.totp_output_file_path}/{config.totp_output_file_name}')}!")
