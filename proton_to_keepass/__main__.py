@@ -4,7 +4,7 @@ from getpass import getpass
 import os
 
 gnupath = input("Enter path to GnuPG/PGP binary (default: /usr/bin/gpg): ") or "/usr/bin/gpg"
-filepath = input("Enter path to encrypted file: ") or "dummy_proton_export.json.gpg"
+filepath = input("Enter path to encrypted file: ")
 passphrase = getpass("Enter passphrase for encrypted file: ")
 outputPath = input("Desired path & filename for output KDBX file (default: ./proton-conversion.kdbx): ") or "./proton-conversion.kdbx"
 kdbxPass = getpass("Password for new KDBX: ") or ""
