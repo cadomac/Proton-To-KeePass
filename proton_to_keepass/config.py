@@ -24,23 +24,20 @@ class Config():
 
     self.parse_args()
     self.gather_input()
-
-  def __str__(self):
-    return f"Config(verbose={self.verbose})"
   
   def parse_args(self):
     arg_len = len(self._args)
     if arg_len <= 1:
       return
     
-    if self._args[1] == "--version":
+    if self._args[1] == "--version" or self._args[1] == "-v":
       print(f"{__version__}")
       exit()
 
     if "--path" in self._args or "-p" in self._args:
       self.parse_path("--path" if "--path" in self._args else "-p", arg_len)
 
-    if "--verbose" in self._args or "-v" in self._args:
+    if "--verbose" in self._args or "-vb" in self._args:
       self._verbose = True
 
   def parse_path(self, path_arg, arg_len):
@@ -113,13 +110,13 @@ class Config():
     default_totp_filename = f"./pp_convert_totp_{self._timestamp}.kdbx"
     self._totp_output_name = input(f"Desired name for output TOTP KDBX file ({default_totp_filename}): ") or default_totp_filename
     self._totp_output_path = input(f"Desired path for output TOTP KDBX file ({self._cwd}): ") or self._cwd
-    self._kdbx_totp_pass = getpass("Password for TOTP KDBX (default: same as main file): ") or self._kdbx_pass
+    self._kdbx_totp_pass = getpass("Password for TOTP KDBX: ")
     if self._kdbx_totp_pass == self._kdbx_pass:
       diff_pass = input("   Using the same password is not as secure as using different passwords. Use different password? (y/n): ")
       if diff_pass == "y":
         self._kdbx_totp_pass = getpass("Password for TOTP KDBX: ")
         if self._kdbx_totp_pass == "":
-          self._kdbx_totp_pass = self.empty_input_handler("Password for TOTP KDBX", "Error: No password provided.", allowIgnore=True)
+          self._kdbx_totp_pass = self.empty_input_handler("Password for TOTP KDBX", "Error: No password provided.", allow_ignore=True)
   
   def get_new_timestamp(self):
     return datetime.now().strftime("%Y-%m-%d_%H-%M-%S-%f")[:-3]
