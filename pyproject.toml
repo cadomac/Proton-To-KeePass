@@ -1,19 +1,13 @@
 [project]
-name = "proton_to_keepass"
+name = "proton-to-keepass"
 version = "1.0.0"
+description = "Convert Proton Pass exports to KeePass databases securely"
 authors = [
-  { name="Cameron MacDonald", email="pypi.ember745@passmail.net" },
+    {name = "Cameron MacDonald",email = "12107773+cadomac@users.noreply.github.com"}
 ]
-description = "Convert Proton Pass exports to KeePass databases securely for encrypted local backup."
+license = {text = "MIT"}
 readme = "README.md"
-requires-python = ">=3.8"
-classifiers = [
-    "Programming Language :: Python :: 3",
-    "Development Status :: 4 - Beta",
-    "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
-    "Operating System :: OS Independent",
-]
-keywords = ["proton", "pass", "password", "manager", "keepass", "convert", "converter", "conversion"]
+requires-python = ">=3.13"
 dependencies = [
   "argon2-cffi==23.1.0",
   "argon2-cffi-bindings==21.2.0",
@@ -32,3 +26,7 @@ dependencies = [
 [project.urls]
 Homepage = "https://github.com/cadomac/Proton-To-KeePass"
 Issues = "https://github.com/cadomac/Proton-To-KeePass/issues"
+
+[build-system]
+requires = ["poetry-core>=2.0.0,<3.0.0"]
+build-backend = "poetry.core.masonry.api"

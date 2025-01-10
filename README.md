@@ -10,9 +10,8 @@ You must have **GnuPG** installed to utilize this module.
 You can find more information on installing and configuring GnuPG on their website, [gnupg.org](https://www.gnupg.org/).
 
 ## Installation
-```sh
-python3 -m pip install proton_to_keepass
-```
+
+The package is not available on PyPI due to build issues with some packages. You will have to download the source, install the virtual environment, and run it locally.
 
 ## How To Use
 
